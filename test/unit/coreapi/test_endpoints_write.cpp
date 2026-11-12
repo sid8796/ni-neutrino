@@ -1017,9 +1017,9 @@ TEST_CASE("every route that changes something asks for more than a read", "[writ
 	// A walk that found nothing would pass this whatever the tables held, and a
 	// route added at a level below a write has to move this number by hand.
 #ifdef ENABLE_MCP
-	REQUIRE(changing == 58);
+	REQUIRE(changing == 59);
 #else
-	REQUIRE(changing == 50);
+	REQUIRE(changing == 51);
 #endif
 }
 
@@ -1342,7 +1342,7 @@ const coreapi::Descriptor kFanRow[] =
 		1, 14, NULL, 0, 1, NULL, false, false, COREAPI_ALWAYS,
 		{ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, coreapi::FieldOrigin::Nowhere,
 		  fixtureFan, NULL, NULL },
-		NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL
+		NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL
 	},
 };
 } // namespace
@@ -1559,14 +1559,14 @@ const coreapi::Descriptor kKeyAndService[] =
 		0, 0, NULL, 0, 0, "", false, true, COREAPI_ALWAYS,
 		{ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, coreapi::FieldOrigin::Nowhere,
 		  NULL, NULL, NULL },
-		NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL
+		NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL
 	},
 	{
 		"fixture_service", coreapi::ValueType::Bool, "fixture", NULL, NULL,
 		0, 1, NULL, 0, 0, NULL, false, false, COREAPI_CONDITIONS(kFixtureKeyValid),
 		{ NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, coreapi::FieldOrigin::Nowhere,
 		  NULL, NULL, NULL },
-		NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL
+		NULL, NULL, NULL, NULL, NULL, NULL, false, NULL, NULL, NULL
 	},
 };
 } // namespace

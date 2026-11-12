@@ -123,6 +123,18 @@ long lcd4lBrightnessMax(const ValueLookup *now)
 		return 10;
 	return settings::lcd4lBrightnessCeiling(type);
 }
+
+/* The panel's floor, read the same way: zero for the Samsung panels and one for the Pearl
+   one. Where the panel cannot be read the floor stays one, as it was for every panel. */
+long lcd4lBrightnessMin(const ValueLookup *now)
+{
+	long type = 0;
+	const bool read = now != NULL ? now->read("lcd4l_display_type", &type, now->context)
+	                              : settingsSource().readInt("lcd4l_display_type", type) == Status::Ok;
+	if (!read)
+		return 1;
+	return settings::lcd4lBrightnessFloor(type);
+}
 #endif
 
 #if defined(ENABLE_GRAPHLCD) || defined(ENABLE_LCD4LINUX)
@@ -192,6 +204,7 @@ constexpr Descriptor kSettings[] =
 	   none. The ceiling is the panel's and the build decides it. */
 	intRow("lcd_dim_brightness")
 		.section("display")
+		.group(&kDisplayBrightness)
 		.label("lcdmenu.dim_brightness")
 		.hint("menu.hint_vfd_brightnessdim")
 #ifdef ENABLE_LCD
@@ -206,6 +219,7 @@ constexpr Descriptor kSettings[] =
 	   row carries neither the length nor the digits. */
 	textRow("lcd_dim_time")
 		.section("display")
+		.group(&kDisplayBrightness)
 		.label("lcdmenu.dim_time")
 		.hint("menu.hint_vfd_dimtime")
 		.defaultValue("0")
@@ -213,6 +227,7 @@ constexpr Descriptor kSettings[] =
 		.field(COREAPI_TEXT_FIELD_ON(lcd_setting_dim_time, canSetPanelBrightness, NULL)),
 	enumRow("led_tv_mode")
 		.section("display")
+		.group(&kDisplayLeds)
 		.label("ledcontroler.mode.tv")
 		.hint("menu.hint_leds_tv")
 		.defaultValue(2)
@@ -220,6 +235,7 @@ constexpr Descriptor kSettings[] =
 		.field(COREAPI_NUMBER_FIELD_ON(led_tv_mode, hasLedMenu, NULL)),
 	enumRow("led_standby_mode")
 		.section("display")
+		.group(&kDisplayLeds)
 		.label("ledcontroler.mode.standby")
 		.hint("menu.hint_leds_standby")
 		.defaultValue(3)
@@ -227,6 +243,7 @@ constexpr Descriptor kSettings[] =
 		.field(COREAPI_NUMBER_FIELD_ON(led_standby_mode, hasLedMenu, NULL)),
 	enumRow("led_deep_mode")
 		.section("display")
+		.group(&kDisplayLeds)
 		.label("ledcontroler.mode.deepstandby")
 		.hint("menu.hint_leds_deepstandby")
 		.defaultValue(3)
@@ -234,6 +251,7 @@ constexpr Descriptor kSettings[] =
 		.field(COREAPI_NUMBER_FIELD_ON(led_deep_mode, hasLedMenu, NULL)),
 	enumRow("led_rec_mode")
 		.section("display")
+		.group(&kDisplayLeds)
 		.label("ledcontroler.mode.record")
 		.hint("menu.hint_leds_record")
 		.defaultValue(1)
@@ -241,18 +259,21 @@ constexpr Descriptor kSettings[] =
 		.field(COREAPI_NUMBER_FIELD_ON(led_rec_mode, hasLedMenu, NULL)),
 	boolRow("led_blink")
 		.section("display")
+		.group(&kDisplayLeds)
 		.label("ledcontroler.blink")
 		.hint("menu.hint_leds_blink")
 		.defaultValue(1)
 		.field(COREAPI_NUMBER_FIELD_ON(led_blink, hasLedMenu, NULL)),
 	boolRow("backlight_tv")
 		.section("display")
+		.group(&kDisplayBacklight)
 		.label("ledcontroler.backlight.tv")
 		.hint("menu.hint_leds_tv")
 		.defaultValue(1)
 		.field(COREAPI_NUMBER_FIELD_ON(backlight_tv, hasBacklight, NULL)),
 	boolRow("backlight_standby")
 		.section("display")
+		.group(&kDisplayBacklight)
 		.label("ledcontroler.backlight_standby")
 		.menuLabel("ledcontroler.mode.standby")
 		.hint("menu.hint_leds_standby")
@@ -260,6 +281,7 @@ constexpr Descriptor kSettings[] =
 		.field(COREAPI_NUMBER_FIELD_ON(backlight_standby, hasBacklight, NULL)),
 	boolRow("backlight_deepstandby")
 		.section("display")
+		.group(&kDisplayBacklight)
 		.label("ledcontroler.backlight_deepstandby")
 		.menuLabel("ledcontroler.mode.deepstandby")
 		.hint("menu.hint_leds_deepstandby")
@@ -270,6 +292,7 @@ constexpr Descriptor kSettings[] =
 	   the panel is a graphical one. Nought is what a box without one gets. */
 	boolRow("glcd_enable")
 		.section("display")
+		.group(&kDisplayGlcd)
 		.label("glcd.enable")
 		.defaultValue(0)
 		.defaultFrom(glcdEnableDefault)
@@ -278,6 +301,7 @@ constexpr Descriptor kSettings[] =
 	   one outside it into nought, which is why a wide ceiling is safe. */
 	intRow("glcd_selected_config")
 		.section("display")
+		.group(&kDisplayGlcd)
 		.label("glcd.display")
 		.range(0, 99)
 		.defaultValue(0)
@@ -285,18 +309,21 @@ constexpr Descriptor kSettings[] =
 		.field(COREAPI_NUMBER_FIELD(glcd_selected_config)),
 	textRow("glcd_logodir")
 		.section("display")
+		.group(&kDisplayGlcd)
 		.label("glcd.logodir")
 		.defaultValue(TARGET_ROOT "/media/sda1/logos")
 		.text(kRuleDirectory)
 		.field(COREAPI_TEXT_FIELD(glcd_logodir)),
 	intRow("glcd_brightness")
 		.section("display")
+		.group(&kDisplayGlcd)
 		.label("glcd.brightness")
 		.range(0, 10)
 		.defaultValue(GLCD_DEFAULT_BRIGHTNESS)
 		.field(COREAPI_NUMBER_FIELD(glcd_brightness)),
 	intRow("glcd_brightness_standby")
 		.section("display")
+		.group(&kDisplayGlcd)
 		.label("glcd.brightness_standby")
 		.range(0, 10)
 		.defaultValue(GLCD_DEFAULT_BRIGHTNESS_STANDBY)
@@ -304,6 +331,7 @@ constexpr Descriptor kSettings[] =
 		.field(COREAPI_NUMBER_FIELD(glcd_brightness_standby)),
 	intRow("glcd_brightness_dim")
 		.section("display")
+		.group(&kDisplayGlcd)
 		.label("glcd.brightness_dim")
 		.range(0, 10)
 		.defaultValue(GLCD_DEFAULT_BRIGHTNESS_DIM)
@@ -312,12 +340,14 @@ constexpr Descriptor kSettings[] =
 	   neither. */
 	textRow("glcd_brightness_dim_time")
 		.section("display")
+		.group(&kDisplayGlcd)
 		.label("glcd.brightness_dim_time")
 		.defaultValue(GLCD_DEFAULT_BRIGHTNESS_DIM_TIME)
 		.text(kRuleNumberText5)
 		.field(COREAPI_TEXT_FIELD(glcd_brightness_dim_time)),
 	boolRow("glcd_scroll")
 		.section("display")
+		.group(&kDisplayGlcd)
 		.label("glcd.scroll")
 		.defaultValue(1)
 		.field(COREAPI_NUMBER_FIELD(glcd_scroll)),
@@ -326,6 +356,7 @@ constexpr Descriptor kSettings[] =
 	   gets. */
 	intRow("glcd_scroll_speed")
 		.section("display")
+		.group(&kDisplayGlcd)
 		.label("glcd.scroll_speed")
 		.range(1, 63)
 		.defaultValue(5)
@@ -333,11 +364,13 @@ constexpr Descriptor kSettings[] =
 		.field(COREAPI_NUMBER_FIELD(glcd_scroll_speed)),
 	boolRow("glcd_mirror_osd")
 		.section("display")
+		.group(&kDisplayGlcd)
 		.label("glcd.mirror_osd")
 		.defaultValue(0)
 		.field(COREAPI_NUMBER_FIELD(glcd_mirror_osd)),
 	boolRow("glcd_mirror_video")
 		.section("display")
+		.group(&kDisplayGlcd)
 		.label("glcd.mirror_video")
 		.defaultValue(0)
 		.field(COREAPI_NUMBER_FIELD(glcd_mirror_video)),
@@ -345,6 +378,7 @@ constexpr Descriptor kSettings[] =
 #ifdef ENABLE_LCD4LINUX
 	enumRow("lcd4l_support")
 		.section("display")
+		.group(&kDisplayLcd4l)
 		.label("lcd4l_support")
 		.hint("menu.hint_lcd4l_support")
 		.defaultValue(0)
@@ -352,6 +386,7 @@ constexpr Descriptor kSettings[] =
 		.field(COREAPI_NUMBER_FIELD(lcd4l_support)),
 	textRow("lcd4l_logodir")
 		.section("display")
+		.group(&kDisplayLcd4l)
 		.label("lcd4l_logodir")
 		.hint("menu.hint_lcd4l_logodir")
 		.defaultValue(TARGET_ROOT "/media/sda1/logos")
@@ -359,6 +394,7 @@ constexpr Descriptor kSettings[] =
 		.field(COREAPI_TEXT_FIELD(lcd4l_logodir)),
 	enumRow("lcd4l_display_type")
 		.section("display")
+		.group(&kDisplayLcd4l)
 		.label("lcd4l_display_type")
 		.hint("menu.hint_lcd4l_display_type")
 		.defaultValue(0)
@@ -366,6 +402,7 @@ constexpr Descriptor kSettings[] =
 		.field(COREAPI_NUMBER_FIELD(lcd4l_display_type)),
 	enumRow("lcd4l_skin")
 		.section("display")
+		.group(&kDisplayLcd4l)
 		.label("lcd4l_skin")
 		.hint("menu.hint_lcd4l_skin")
 		.defaultValue(0)
@@ -373,32 +410,38 @@ constexpr Descriptor kSettings[] =
 		.field(COREAPI_NUMBER_FIELD(lcd4l_skin)),
 	boolRow("lcd4l_skin_radio")
 		.section("display")
+		.group(&kDisplayLcd4l)
 		.label("lcd4l_skin_radio")
 		.hint("menu.hint_lcd4l_skin_radio")
 		.defaultValue(0)
 		.field(COREAPI_NUMBER_FIELD(lcd4l_skin_radio)),
-	/* The ceiling is the panel's and the box asks it at run time: seven for the
-	   Pearl panel and ten for the three Samsung ones. Ten is the wider and holds
-	   every value either offers. */
+	/* The bounds are the panel's and the box asks them at run time: one to seven
+	   for the Pearl panel and zero to ten for the three Samsung ones. Zero to ten
+	   is the wider and holds every value either offers. */
 	intRow("lcd4l_brightness")
 		.section("display")
+		.group(&kDisplayLcd4l)
 		.label("lcd4l_brightness")
 		.hint("menu.hint_lcd4l_brightness")
-		.range(1, 10)
+		.range(0, 10)
+		.minNow(lcd4lBrightnessMin)
 		.maxNow(lcd4lBrightnessMax)
 		.defaultValue(7)
 		.field(COREAPI_NUMBER_FIELD(lcd4l_brightness)),
 	intRow("lcd4l_brightness_standby")
 		.section("display")
+		.group(&kDisplayLcd4l)
 		.label("lcd4l_brightness_standby")
 		.hint("menu.hint_lcd4l_brightness_standby")
-		.range(1, 10)
+		.range(0, 10)
+		.minNow(lcd4lBrightnessMin)
 		.maxNow(lcd4lBrightnessMax)
 		.defaultValue(3)
 		.changeableWhen(kNotRealShutdown)
 		.field(COREAPI_NUMBER_FIELD(lcd4l_brightness_standby)),
 	boolRow("lcd4l_convert")
 		.section("display")
+		.group(&kDisplayLcd4l)
 		.label("lcd4l_convert")
 		.hint("menu.hint_lcd4l_convert")
 		.defaultValue(1)
@@ -408,6 +451,7 @@ constexpr Descriptor kSettings[] =
 	   before. */
 	boolRow("lcd4l_screenshots")
 		.section("display")
+		.group(&kDisplayLcd4l)
 		.label("lcd4l_screenshots")
 		.hint("menu.hint_lcd4l_screenshots")
 		.defaultValue(0)
@@ -420,6 +464,7 @@ constexpr Descriptor kSettings[] =
 	   and empty otherwise, which is what every box that has saved once gets. */
 	textRow("glcd_theme_name")
 		.section("display")
+		.group(&kDisplayGlcd)
 		.defaultValue("")
 		.needsRestart()
 		.text(kRuleNameFromList)
@@ -428,16 +473,19 @@ constexpr Descriptor kSettings[] =
 	   no alpha. The defaults are the ones its theme file falls back to. */
 	colorRow("glcd_theme.glcd_foreground_color")
 		.section("display")
+		.group(&kDisplayGlcd)
 		.label("glcd.color_fg")
 		.defaultValue("#ffffff")
 		.field(COREAPI_COLOR_FIELD(glcd_theme, glcd_foreground_color, false)),
 	colorRow("glcd_theme.glcd_background_color")
 		.section("display")
+		.group(&kDisplayGlcd)
 		.label("glcd.color_bg")
 		.defaultValue("#000000")
 		.field(COREAPI_COLOR_FIELD(glcd_theme, glcd_background_color, false)),
 	colorRow("glcd_theme.glcd_progressbar_color")
 		.section("display")
+		.group(&kDisplayGlcd)
 		.label("glcd.progressbar_color")
 		.defaultValue("#fafafa")
 		.changeableWhen(kGlcdProgressbarColorOn)

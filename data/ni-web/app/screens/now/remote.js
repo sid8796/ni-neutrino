@@ -81,6 +81,23 @@ const GROUPS = [
 		 'KEY_REWIND', 'KEY_FORWARD', 'KEY_PREVIOUSSONG', 'KEY_NEXTSONG'] },
 	{ id: 'bottom', shape: 'now-keys-bottom',
 	  keys: ['KEY_SUBTITLE', 'KEY_TEXT', 'KEY_AUDIO', 'KEY_VIDEO', 'KEY_SAT', 'KEY_WWW', 'KEY_HELP'] },
+	/* THE FUNCTION KEYS ARE NOT ON THE HANDSET, SO THEY STAND UNDER IT AND APART.
+	   A handset has none of them, but the box acts on them, and folded away
+	   among a hundred names they were keys nobody found. Under
+	   the last row and with more room above them than between two rows, so they
+	   read as keys of their own and not as one more row of the handset. */
+	{ id: 'function', shape: 'now-keys-function',
+	  keys: ['KEY_F1', 'KEY_F2', 'KEY_F3', 'KEY_F4', 'KEY_F5',
+		 'KEY_F6', 'KEY_F7', 'KEY_F8', 'KEY_F9', 'KEY_F10'] },
+	/* THE SWITCHES THAT SAY WHICH WAY, UNDER THE FUNCTION KEYS. No handset has
+	   them either: power, mute and the like as a key that only ever turns a
+	   thing on and one that only ever turns it off. Two rows of four, laid out
+	   as the colour keys are, each "on" beside its "off": power and standby in
+	   the first, mute and the analogue outputs in the second. */
+	{ id: 'switch-group-1', shape: 'now-keys-switch',
+	  keys: ['KEY_POWERON', 'KEY_POWEROFF', 'KEY_STANDBYON', 'KEY_STANDBYOFF'] },
+	{ id: 'switch-group-2', shape: 'now-keys-switch',
+	  keys: ['KEY_MUTEON', 'KEY_MUTEOFF', 'KEY_ANALOGON', 'KEY_ANALOGOFF'] },
 ];
 
 /* What a key on the keyboard stands for. Only the three the plan of this
@@ -693,8 +710,10 @@ export default function Remote(props) {
 				<//>`
 				: html`${shot.seen}${sent}`}
 		</div>
+		${/* NO HEADING OVER THE KEYS. They are plainly a remote control, and
+		     "the keys of this box" over them told nobody anything. The group of
+		     keys below carries that name for a screen reader. */''}
 		<${Card}
-			title=${t(text, 'now.remote.card.keys')}
 			snapshot=${keys}
 			empty=${keys.data && named.length === 0 ? t(text, 'now.remote.none') : undefined}>
 			${/* Offered where the picture stands over the keys, which is a
@@ -728,7 +747,7 @@ export default function Remote(props) {
 							${drawn}
 						</details>`;
 					}
-					return html`<section key=${group.id} class="now-keygroup">
+					return html`<section key=${group.id} class=${'now-keygroup now-keygroup-' + group.id}>
 						${drawn}
 					</section>`;
 				})}

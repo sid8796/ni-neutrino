@@ -175,6 +175,27 @@ fi
 # between fitting and not.
 AM_CONDITIONAL(ENABLE_API_DOC, test "$enable_api_doc" = "yes")
 
+# On, the JavaScript and CSS of the web pages go onto the box minified; the
+# tree keeps its prose and its layout. Done on the build host by esbuild
+# (data/ni-web/minify.sh), which has to be found there; ni-buildsystem builds
+# it as host-esbuild. Saves about 280 KB of flash, worth it on a box with
+# little.
+# Off by default: the pages are installed as they are in the tree, which is
+# easier to read on a box while debugging.
+AC_ARG_ENABLE(web-strip,
+	AS_HELP_STRING([--enable-web-strip], [install the web pages minified @<:@default=no@:>@]),
+	[enable_web_strip="$enableval"],
+	[enable_web_strip="no"])
+AC_ARG_VAR([ESBUILD], [esbuild on the build host, to minify the web pages])
+if test "$enable_web_strip" = "yes"; then
+	AC_PATH_PROGS([ESBUILD], [esbuild])
+	test -n "$ESBUILD" || AC_MSG_ERROR([esbuild is needed to minify the web pages; install it, set ESBUILD or configure without --enable-web-strip])
+	WEB_STRIP='$(SHELL) $(abs_top_srcdir)/data/ni-web/minify.sh $(ESBUILD)'
+else
+	WEB_STRIP=cp
+fi
+AC_SUBST(WEB_STRIP)
+
 # The copied control API, the seventy-four handlers under /control/ that the
 # old web server used to answer alone (see src/httpd/compat/). A size lever
 # for a box like nevis, which nothing still calling that surface runs on: off
@@ -245,13 +266,13 @@ if test -z "$FREETYPE_LIBS" -a -z "$FREETYPE_CFLAGS"; then
 	TUXBOX_APPS_LIB_CONFIG(FREETYPE,freetype-config)
 	CPPFLAGS+=" $FREETYPE_CFLAGS"
 	AC_MSG_CHECKING([whether FreeType version is 2.5.0 or higher])
-	AC_TRY_CPP([
+	AC_PREPROC_IFELSE([AC_LANG_SOURCE([[
 		#include <ft2build.h>
 		#include FT_FREETYPE_H
 		#if FREETYPE_MAJOR < 2 || (FREETYPE_MAJOR == 2 && FREETYPE_MINOR < 5)
 		#error Freetype version too low.
 		#endif
-	], [
+	]])], [
 		AC_MSG_RESULT(yes)
 	], [
 		AC_MSG_ERROR([Need FreeType library version 2.5.0 or higher])
@@ -630,6 +651,28 @@ if test "$enable_lua" = "yes"; then
 fi
 AM_CONDITIONAL(ENABLE_LUA, test "$enable_lua" = "yes")
 
+# Python support is off unless it is asked for: the interpreter has to be on
+# the box for the bindings to have anything to run in, and a build that
+# turns it on against a box without one produces a program that will not
+# start. A build that wants it says so, and is then held to it.
+AC_ARG_ENABLE(python,
+	AS_HELP_STRING([--enable-python], [enable Python support @<:@default=no@:>@]),
+	[enable_python="$enableval"],
+	[enable_python="no"])
+
+PYTHON_CFLAGS=""
+PYTHON_LIBS=""
+
+if test "$enable_python" = "yes"; then
+	AC_DEFINE(ENABLE_PYTHON, 1, [include Python support])
+	PKG_CHECK_MODULES(PYTHON, python3-embed, HPYTHON="yes", HPYTHON="no")
+	if test "x$HPYTHON" != "xyes"; then
+		AC_MSG_ERROR([requested Python support, but python3-embed was not found])
+	fi
+	AC_MSG_NOTICE([Using Python provider: $HPYTHON_PROVIDER])
+fi
+AM_CONDITIONAL(ENABLE_PYTHON, test "$enable_python" = "yes")
+
 AC_ARG_ENABLE(cleanup,
 	AS_HELP_STRING([--enable-cleanup], [enable cleanup on exit @<:@default=no@:>@]),
 	AC_DEFINE(EXIT_CLEANUP, 1, [enable cleanup on exit]))
@@ -796,6 +839,8 @@ AC_SUBST(STB_HAL_INC)
 AC_SUBST(STB_HAL_LIB)
 AC_SUBST(LUA_CFLAGS)
 AC_SUBST(LUA_LIBS)
+AC_SUBST(PYTHON_CFLAGS)
+AC_SUBST(PYTHON_LIBS)
 AC_SUBST(BLURAY_LIBS)
 AC_SUBST(LIBCOOLSTREAM_STATIC_DIR)
 
@@ -835,7 +880,13 @@ data/lcd/icons/Makefile
 data/logos/Makefile
 data/license/Makefile
 data/locale/Makefile
-data/luaplugins/Makefile
+data/plugins/Makefile
+data/plugins/lua/Makefile
+data/plugins/lua/nlab/Makefile
+data/plugins/python/Makefile
+data/plugins/python/apiinfo/Makefile
+data/plugins/python/apitest/Makefile
+data/plugins/python/replay/Makefile
 data/oled/Makefile
 data/oled/fonts/Makefile
 data/oled/icons/Makefile
@@ -891,6 +942,7 @@ lib/libnet/Makefile
 lib/libtuxtxt/Makefile
 lib/libupnpclient/Makefile
 lib/luaclient/Makefile
+lib/pyclient/Makefile
 lib/sectionsdclient/Makefile
 lib/timerdclient/Makefile
 lib/xmltree/Makefile
@@ -907,11 +959,13 @@ src/gui/Makefile
 src/gui/bedit/Makefile
 src/gui/components/Makefile
 src/gui/lua/Makefile
+src/gui/python/Makefile
 src/gui/moviedb/Makefile
 src/gui/moviebrowser/Makefile
 src/gui/widget/Makefile
 src/gui/widget/yaft/Makefile
 src/httpd/Makefile
+src/scriptapi/Makefile
 src/system/Makefile
 src/system/mtdutils/Makefile
 src/system/mtdutils/lib/Makefile

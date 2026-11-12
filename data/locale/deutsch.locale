@@ -800,9 +800,10 @@ flashupdate.fileselector Datei-Auswahl
 flashupdate.flashreadyreboot Das Image wurde erfolgreich geflasht.\nIhre Box wird jetzt neu gestartet.
 flashupdate.getinfofile lade Versioninfo
 flashupdate.getinfofileerror Kann Aktualisierungs-Info nicht laden!
-flashupdate.getupdatefile lade Update
+flashupdate.getupdatefile Lade Update
 flashupdate.getupdatefileerror Kann Aktualisierung nicht laden!
 flashupdate.head Aktualisierung
+flashupdate.install Installiere Update
 flashupdate.install_image Heruntergeladenes Image installieren?
 flashupdate.install_package Heruntergeladenes Paket installieren?
 flashupdate.md5check Imageprüfung
@@ -1325,6 +1326,7 @@ mainmenu.movieplayer Movieplayer
 mainmenu.pausesectionsd EPG auslesen
 mainmenu.pictureviewer Bildbetrachter
 mainmenu.poweroff_menu Ausschalten
+mainmenu.python Python-Plugins
 mainmenu.radiomode Radio-Modus
 mainmenu.reboot Neustart
 mainmenu.recording Aufnehmen
@@ -1643,6 +1645,7 @@ menu.hint_leds_tv Definiert den Status der Power-LEDs im TV-Modus
 menu.hint_load Laden der Einstellungen aus einer Datei
 menu.hint_longkeypress_duration Tasten, die länger als die angegebene Zeit betätigt werden, werden als "langer Tastendruck" behandelt.
 menu.hint_lua Plugins ausführen
+menu.hint_python Python-Plugins ausführen
 menu.hint_make_hdlist Bei aktiver Option werden Bouquets namens 'HD' und 'UHD' erzeugt, in denen alle HD- bzw. UHD-Sender zusammengefasst sind
 menu.hint_make_newlist Nach einer Kanalsuche wird ein Bouquet namens 'neue Kanäle' erzeugt
 menu.hint_make_removedlist Nach einer Kanalsuche wird ein Bouquet namens 'gelöschte Kanäle' erzeugt
@@ -1751,6 +1754,7 @@ menu.hint_pictureviewer_slide_time Ändern Sie den Diashow-Intervall.\nStandardm
 menu.hint_picview Bilder anzeigen
 menu.hint_plugin_type_games Legt fest, ob Spiele im Benutzermenü unter der Rubrik 'Plugin-Typen' gezeigt werden sollen
 menu.hint_plugin_type_lua Legt fest, ob Plugins im Benutzermenü unter der Rubrik 'Plugin-Typen' gezeigt werden sollen
+menu.hint_plugin_type_python Legt fest, ob Python-Plugins im Benutzermenü unter der Rubrik 'Plugin-Typen' gezeigt werden sollen
 menu.hint_plugin_type_scripts Legt fest, ob Skripte im Benutzermenü unter der Rubrik 'Plugin-Typen' gezeigt werden sollen
 menu.hint_plugin_type_tools Legt fest, ob Werkzeuge im Benutzermenü unter der Rubrik 'Plugin-Typen' gezeigt werden sollen
 menu.hint_plugins_control Plugin-Einstellungen und Verwaltung von installierten Plugins
@@ -2628,7 +2632,12 @@ ping.ok ist erreichbar (ping)
 ping.protocol ist nicht erreichbar (Host- oder Protokoll-Fehler)
 ping.socket ist nicht erreichbar (Socket-Fehler)
 ping.unreachable ist nicht erreichbar (unerreichbar)
+pinprotection.changed Die neue PIN ist eingestellt.
 pinprotection.head PIN-Abfrage
+pinprotection.mismatch Die beiden Eingaben stimmen nicht überein. Bitte die neue PIN noch einmal eingeben.
+pinprotection.repeat Neue PIN zur Bestätigung noch einmal eingeben.
+pinprotection.repeat_head Neue PIN wiederholen
+pinprotection.wrong Falsche PIN. Bitte noch einmal eingeben.
 pinprotection.wrongcode Geben Sie den Code nocheinmal ein!
 plugin.hide_no Anzeigen
 plugin.hide_yes Verstecken
@@ -2640,6 +2649,7 @@ plugins.result Pluginausgabe
 plugintype.disabled Deaktiviert
 plugintype.game Spiel
 plugintype.lua Lua-Plugin
+plugintype.python Python-Plugin
 plugintype.script Skript
 plugintype.tool Werkzeug
 poweroff.rec_protected Aufnahmen geschützt
@@ -2757,6 +2767,8 @@ satsetup.fastscan_type Scantyp
 satsetup.fastscan_update Auto-Update
 satsetup.fe_busy Belegt
 satsetup.fe_busy_hint Dieser Tuner wird derzeit von einem anderen Prozess verwendet und kann aus dieser Instanz nicht konfiguriert werden.
+satsetup.fe_fbc_input FBC-Eingang
+satsetup.fe_fbc_virtual FBC virtuell
 satsetup.fe_mode Tuner Modus
 satsetup.fe_mode_independent Independent
 satsetup.fe_mode_link_loop Loop
@@ -2936,7 +2948,9 @@ stringinput.char_not_allowed Zeichen ist hier nicht erlaubt.
 stringinput.clear Alles löschen
 stringinput.empty_not_allowed Eingabe darf nicht leer sein.
 stringinput.insert Einfügen
+stringinput.invalid_date Dieses Datum gibt es nicht.
 stringinput.maxchars_reached Maximale Zeichenzahl erreicht.
+stringinput.range Erlaubt sind Werte von %d bis %d.
 stringinput.save Speichern
 stringinput.save_failed Eingabe kann nicht gespeichert werden.
 stringinput.space Leerzeichen
@@ -3045,11 +3059,14 @@ tunersetup.power 5V-Versorgung bei DVB-T/T2 Kanälen
 tunersetup.sat Satellit (DVB-S/S2)
 tunersetup.terr Terrestrisch (DVB-T/T2)
 tunersetup.tunersetup Tunereinstellungen
+unicable.clash_freq Tuner %d nutzt am selben Kabel bereits die Frequenz %d MHz.\nJeder Tuner braucht ein eigenes Userband, sonst stören sich die beiden.
+unicable.clash_scr Tuner %d nutzt am selben Kabel bereits SCR %d.\nJeder Tuner braucht ein eigenes Userband, sonst stören sich die beiden.
 unicable.freq Unicable Frequenz
 unicable.lnb Unicable Eingang
 unicable.pin Unicable PIN
 unicable.pin_hint PIN (1 - 255) für Benutzerfrequenz\n0 bedeutet inaktiv / aus
 unicable.scr Unicable SCR
+unicable.scr_hint Gezählt ab 0 (wie CH00 im LNB-Datenblatt)\nAndere Geräte zählen oft ab 1
 unit.decimal ,
 unit.long.years Jahre
 unit.short.hour h
