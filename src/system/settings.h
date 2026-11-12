@@ -360,10 +360,11 @@ class CSettingsTextGuard
 /* Every writer of a text setting in the tree is to go through one of these
    three. Not yet: the strings of the GLCD theme, which the GLCD thread writes
    as well, and the members of the containers among the settings - the
-   std::list members, of which nhttpd's xmltv list request rewrites three and
-   every load of the bouquets, on the box's loop as well as on the channel
-   daemon's thread and the scan's, empties and refills xmltv_xml_auto, and the
-   usermenu entries, whose elements the loop replaces whole.
+   std::list members, of which nhttpd's xmltv list request rewrites three, and
+   the usermenu entries, whose elements the loop replaces whole. Every load of
+   the bouquets, on the box's loop as well as on the channel daemon's thread
+   and the scan's, empties and refills xmltv_xml_auto, and does so under the
+   guard (CNeutrinoApp::g_settings_xmltv_xml_auto_clear and _pushback).
 
    Where one assignment of a string is not the unit, the writer holds
    CSettingsTextGuard itself: the string input and the extended input for each
@@ -797,6 +798,7 @@ struct SNeutrinoSettings
 #endif
 		P_MAIN_SCRIPTS,
 		P_MAIN_LUA,
+		P_MAIN_PYTHON,
 		P_MAIN_SETTINGS,
 		P_MAIN_SERVICE,
 		P_MAIN_SLEEPTIMER,
@@ -865,6 +867,7 @@ struct SNeutrinoSettings
 		P_UMENU_PLUGIN_TYPE_TOOLS,
 		P_UMENU_PLUGIN_TYPE_SCRIPTS,
 		P_UMENU_PLUGIN_TYPE_LUA,
+		P_UMENU_PLUGIN_TYPE_PYTHON,
 
 		P_SETTINGS_MAX
 	};
@@ -899,6 +902,7 @@ struct SNeutrinoSettings
 	std::string plugins_disabled;
 	std::string plugins_game;
 	std::string plugins_lua;
+	std::string plugins_python;
 	std::string plugins_script;
 	std::string plugins_tool;
 
@@ -1304,6 +1308,7 @@ struct SNeutrinoSettings
 		ITEM_FILEPLAY_AUDIO = 38,
 		ITEM_TIMESHIFT = 39,
 		ITEM_LCD4LINUX = 40,
+		ITEM_PYTHON = 41,
 
 		ITEM_MAX // MUST be always the last in the list
 	} USER_ITEM;
@@ -1419,7 +1424,9 @@ struct SNeutrinoSettings
 	int mode_left_right_key_tv;
 };
 
-extern const struct personalize_settings_t personalize_settings[SNeutrinoSettings::P_SETTINGS_MAX];
+/* Sized by the enum, so an entry left out is a compile error rather than a
+   row whose name is NULL, which the loop that reads it would hand on. */
+extern const struct personalize_settings_t personalize_settings[];
 
 //#define FILESYSTEM_ENCODING_TO_UTF8(a) (g_settings.filesystem_is_utf8 ? (a) : ZapitTools::Latin1_to_UTF8(a).c_str())
 #define FILESYSTEM_ENCODING_TO_UTF8(a) (isUTF8(a) ? (a) : ZapitTools::Latin1_to_UTF8(a).c_str())

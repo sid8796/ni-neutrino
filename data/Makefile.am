@@ -11,6 +11,7 @@ SUBDIRS = \
 	locale \
 	logos \
 	pictures \
+	plugins \
 	policy \
 	scripts \
 	themes \
@@ -26,11 +27,6 @@ SUBDIRS = \
 if ENABLE_NI_WEB
 SUBDIRS += \
 	ni-web
-endif
-
-if ENABLE_LUA
-SUBDIRS += \
-	luaplugins
 endif
 
 if ENABLE_GRAPHLCD

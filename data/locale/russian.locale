@@ -803,6 +803,7 @@ flashupdate.getinfofileerror не могу определить версию
 flashupdate.getupdatefile обновление
 flashupdate.getupdatefileerror не могу обновить
 flashupdate.head Обновление софта
+flashupdate.install Установка обновления
 flashupdate.install_image Flash downloaded image?
 flashupdate.install_package Install downloadad pack?
 flashupdate.md5check проверка прошивки
@@ -1325,6 +1326,7 @@ mainmenu.movieplayer Видеоплеер
 mainmenu.pausesectionsd Чтение EPG
 mainmenu.pictureviewer Просмотр фотографий
 mainmenu.poweroff_menu Выключение
+mainmenu.python Плагины Python
 mainmenu.radiomode Радио
 mainmenu.reboot Перезагрузка
 mainmenu.recording Запись
@@ -1751,6 +1753,7 @@ menu.hint_pictureviewer_slide_time Slideshow interval, in seconds
 menu.hint_picview View pictures
 menu.hint_plugin_type_games Show games in usermenu at selection 'Plugin types'
 menu.hint_plugin_type_lua Show plugins in usermenu at selection 'Plugin types'
+menu.hint_plugin_type_python Показывать плагины Python в пользовательском меню в разделе «Типы плагинов»
 menu.hint_plugin_type_scripts Show scripts in usermenu at selection 'Plugin types'
 menu.hint_plugin_type_tools Show tools in usermenu at selection 'Plugin types'
 menu.hint_plugins_control Plugin settings and management of installed plugins
@@ -1772,6 +1775,7 @@ menu.hint_progressbar_timescale_invert Select your preferred color gradient
 menu.hint_progressbar_timescale_red Choose the red portion of colored progressbars
 menu.hint_progressbar_timescale_yellow Choose the yellow portion of colored progressbars
 menu.hint_protection Protect content by PIN code\nDefault PIN 0000
+menu.hint_python Запуск плагинов Python
 menu.hint_quadpip Activate QuadPiP
 menu.hint_radiomode Switch box to radio mode
 menu.hint_reboot Reboot box\nNo confirmation
@@ -2628,7 +2632,12 @@ ping.ok доступен (ping)
 ping.protocol недоступен (ошибка сервера или протокола)
 ping.socket недоступен (ошибка сокета)
 ping.unreachable недоступен
+pinprotection.changed Новый PIN-код установлен.
 pinprotection.head Введите PIN-код
+pinprotection.mismatch Введённые PIN-коды не совпадают. Введите новый PIN-код ещё раз.
+pinprotection.repeat Введите новый PIN-код ещё раз для подтверждения.
+pinprotection.repeat_head Повторите новый PIN-код
+pinprotection.wrong Неверный PIN-код. Попробуйте ещё раз.
 pinprotection.wrongcode Неверный PIN-код! Повторите ввод.
 plugin.hide_no Show
 plugin.hide_yes Hide
@@ -2640,6 +2649,7 @@ plugins.result вывод плагина
 plugintype.disabled Disabled
 plugintype.game Game
 plugintype.lua Lua plugin
+plugintype.python Плагин Python
 plugintype.script Script
 plugintype.tool Tool
 poweroff.rec_protected Recordings protected
@@ -2757,6 +2767,8 @@ satsetup.fastscan_type Scan type
 satsetup.fastscan_update Auto update
 satsetup.fe_busy Busy
 satsetup.fe_busy_hint This tuner is currently in use by another process and cannot be configured from this instance.
+satsetup.fe_fbc_input Вход FBC
+satsetup.fe_fbc_virtual Виртуальный тюнер FBC
 satsetup.fe_mode Tuner mode
 satsetup.fe_mode_independent Independent
 satsetup.fe_mode_link_loop Loop
@@ -2936,7 +2948,9 @@ stringinput.char_not_allowed Character not allowed here.
 stringinput.clear очистить все
 stringinput.empty_not_allowed Input must not be empty.
 stringinput.insert Insert
+stringinput.invalid_date Такой даты не существует.
 stringinput.maxchars_reached Maximum number of characters reached.
+stringinput.range Допустимые значения: от %d до %d.
 stringinput.save Save
 stringinput.save_failed Input cannot be saved.
 stringinput.space Space
@@ -3045,11 +3059,14 @@ tunersetup.power 5V supply on DVB-T/T2 channels
 tunersetup.sat Satellite (DVB-S/S2)
 tunersetup.terr Terrestrial (DVB-T/T2)
 tunersetup.tunersetup Tuner setup
+unicable.clash_freq Тюнер %d уже использует частоту %d МГц на том же кабеле.\nДля каждого тюнера нужна отдельная пользовательская полоса, иначе они будут мешать друг другу.
+unicable.clash_scr Тюнер %d уже использует SCR %d на том же кабеле.\nДля каждого тюнера нужна отдельная пользовательская полоса, иначе они будут мешать друг другу.
 unicable.freq Unicable Frequency
 unicable.lnb Unicable Input
 unicable.pin Unicable PIN
 unicable.pin_hint PIN (1 - 255) for user frequency\n0 means inactive / off
 unicable.scr Unicable SCR
+unicable.scr_hint Нумерация начинается с 0 (как CH00 в документации LNB).\nНа других устройствах она часто начинается с 1.
 unit.decimal .
 unit.long.years years
 unit.short.hour h

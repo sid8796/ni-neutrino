@@ -45,8 +45,8 @@ import { fold } from '../../ui/kept.js';
 import { State } from '../../ui/state.js';
 import { Card, useResource, drawableProblem } from './parts.js';
 import { useCapture } from './screenshot.js';
-import { Dialog } from '../../ui/dialog.js';
-import shell from '../../shell.text.js';
+import { useStandby } from '../../ui/power.js';
+import * as session from '../../session.js';
 
 export const css = '/app/screens/now/now.css';
 /** @returns {string} the sentence the frame draws under the name of this screen */
@@ -81,6 +81,23 @@ const GROUPS = [
 		 'KEY_REWIND', 'KEY_FORWARD', 'KEY_PREVIOUSSONG', 'KEY_NEXTSONG'] },
 	{ id: 'bottom', shape: 'now-keys-bottom',
 	  keys: ['KEY_SUBTITLE', 'KEY_TEXT', 'KEY_AUDIO', 'KEY_VIDEO', 'KEY_SAT', 'KEY_WWW', 'KEY_HELP'] },
+	/* THE FUNCTION KEYS ARE NOT ON THE HANDSET, SO THEY STAND UNDER IT AND APART.
+	   A handset has none of them, but the box acts on them, and folded away
+	   among a hundred names they were keys nobody found. Under
+	   the last row and with more room above them than between two rows, so they
+	   read as keys of their own and not as one more row of the handset. */
+	{ id: 'function', shape: 'now-keys-function',
+	  keys: ['KEY_F1', 'KEY_F2', 'KEY_F3', 'KEY_F4', 'KEY_F5',
+		 'KEY_F6', 'KEY_F7', 'KEY_F8', 'KEY_F9', 'KEY_F10'] },
+	/* THE SWITCHES THAT SAY WHICH WAY, UNDER THE FUNCTION KEYS. No handset has
+	   them either: power, mute and the like as a key that only ever turns a
+	   thing on and one that only ever turns it off. Two rows of four, laid out
+	   as the colour keys are, each "on" beside its "off": power and standby in
+	   the first, mute and the analogue outputs in the second. */
+	{ id: 'switch-group-1', shape: 'now-keys-switch',
+	  keys: ['KEY_POWERON', 'KEY_POWEROFF', 'KEY_STANDBYON', 'KEY_STANDBYOFF'] },
+	{ id: 'switch-group-2', shape: 'now-keys-switch',
+	  keys: ['KEY_MUTEON', 'KEY_MUTEOFF', 'KEY_ANALOGON', 'KEY_ANALOGOFF'] },
 ];
 
 /* What a key on the keyboard stands for. Only the three the plan of this
@@ -308,7 +325,6 @@ export default function Remote(props) {
 	const isLocked = !!(lock.data && lock.data.locked);
 	const lockBarred = asleep && !isLocked;
 	const [last, setLast] = useState('');
-	const [askingPower, setAskingPower] = useState(false);
 	// The address is the truth: /now/remote/control is the handset full screen.
 	const full = props.param === 'control';
 	const pushed = useRef(false);
@@ -407,18 +423,28 @@ export default function Remote(props) {
 	   television, and on a screen of sixty keys it is the one a slip costs
 	   most. Every way of pressing comes through here, the drawn keys and the
 	   keyboard alike, so neither of them gets round it.
-	   Waking does not ask. A box that has not yet said which it is in is taken
-	   to be on, because asking once too often costs a press and not asking
-	   once too often costs the evening's film.
-	   What is sent on yes is still the key and not the standby address: the
-	   box decides what its power key does, and this screen presses keys. */
+	   Waking asks only where the box would switch the television on with it,
+	   as the header's key does. A box that has not yet said which it is in is
+	   taken to be on, because asking once too often costs a press and not
+	   asking once too often costs the evening's film.
+	   The question is the header's (app/ui/power.js), with the switch for the
+	   television where HDMI-CEC would take it along. What is sent on yes is
+	   still the key where that switch was not there: the box decides what its
+	   power key does, and this screen presses keys. Where it was, the answer
+	   about the television goes with the standby address, which is the only
+	   thing that can carry it. */
+	const power = useStandby({
+		plain: function () { send('KEY_POWER'); },
+		gate: session.requireWrite,
+	});
+
 	/**
 	 * @param {string} name
 	 * @returns {void}
 	 */
 	function press(name) {
-		if (name === 'KEY_POWER' && !(mode.data && mode.data.on === true)) {
-			setAskingPower(true);
+		if (name === 'KEY_POWER') {
+			power.request(!(mode.data && mode.data.on === true));
 			return;
 		}
 		send(name);
@@ -684,8 +710,10 @@ export default function Remote(props) {
 				<//>`
 				: html`${shot.seen}${sent}`}
 		</div>
+		${/* NO HEADING OVER THE KEYS. They are plainly a remote control, and
+		     "the keys of this box" over them told nobody anything. The group of
+		     keys below carries that name for a screen reader. */''}
 		<${Card}
-			title=${t(text, 'now.remote.card.keys')}
 			snapshot=${keys}
 			empty=${keys.data && named.length === 0 ? t(text, 'now.remote.none') : undefined}>
 			${/* Offered where the picture stands over the keys, which is a
@@ -719,7 +747,7 @@ export default function Remote(props) {
 							${drawn}
 						</details>`;
 					}
-					return html`<section key=${group.id} class="now-keygroup">
+					return html`<section key=${group.id} class=${'now-keygroup now-keygroup-' + group.id}>
 						${drawn}
 					</section>`;
 				})}
@@ -749,13 +777,6 @@ export default function Remote(props) {
 		${beside
 			? null
 			: html`<${Card} title=${t(text, 'now.shot.card.screen')}>${shot.options}<//>`}
-		<${Dialog}
-			open=${askingPower}
-			title=${t(shell, 'shell.power.standby')}
-			confirmLabel=${t(shell, 'shell.power.standby')}
-			onCancel=${function () { setAskingPower(false); }}
-			onConfirm=${function () { setAskingPower(false); send('KEY_POWER'); }}>
-			<p>${t(shell, 'shell.power.ask')}</p>
-		<//>
+		${power.question}
 	</div>`;
 }

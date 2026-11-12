@@ -107,12 +107,12 @@ struct KeptPluginSettings
 
 } // namespace
 
-TEST_CASE("the plugin folder and the five type lists are one group that runs once the list exists", "[apply][plugins]")
+TEST_CASE("the plugin folder and the six type lists are one group that runs once the list exists", "[apply][plugins]")
 {
 	Fresh fresh;
 	registerApplyGroups();
 	const char *const keys[] = { "plugin_hdd_dir", "plugins_disabled", "plugins_game", "plugins_lua",
-				     "plugins_script", "plugins_tool" };
+				     "plugins_python", "plugins_script", "plugins_tool" };
 	for (size_t i = 0; i < sizeof(keys) / sizeof(keys[0]); ++i)
 	{
 		INFO(keys[i]);
@@ -190,6 +190,7 @@ TEST_CASE("the five plugin lists written as one answer read the list once and st
 	members.push_back(std::make_pair(std::string("plugins_tool"), std::string("chess.cfg")));
 	members.push_back(std::make_pair(std::string("plugins_script"), std::string()));
 	members.push_back(std::make_pair(std::string("plugins_lua"), std::string()));
+	members.push_back(std::make_pair(std::string("plugins_python"), std::string()));
 	settings::Refusals failed;
 	settings::writeBatch(members, failed, true);
 
@@ -680,9 +681,12 @@ TEST_CASE("a change of the panel, the skin, the brightness or the screenshots re
 {
 	Fresh fresh;
 	Lcd4lBox box;
-	int *const members[] = { &g_settings.lcd4l_display_type, &g_settings.lcd4l_skin, &g_settings.lcd4l_brightness,
-				 &g_settings.lcd4l_screenshots };
-	const char *const keys[] = { "lcd4l_display_type", "lcd4l_skin", "lcd4l_brightness", "lcd4l_screenshots" };
+	// The Pearl panel, whose brightness is read only as the daemon starts; the panel is changed last.
+	g_settings.lcd4l_display_type = 0;
+	REQUIRE(waited(applyKey("lcd4l_display_type")) == Status::Ok);
+	int *const members[] = { &g_settings.lcd4l_skin, &g_settings.lcd4l_brightness, &g_settings.lcd4l_screenshots,
+				 &g_settings.lcd4l_display_type };
+	const char *const keys[] = { "lcd4l_skin", "lcd4l_brightness", "lcd4l_screenshots", "lcd4l_display_type" };
 	for (size_t i = 0; i < 4; ++i)
 	{
 		INFO(keys[i]);
@@ -696,6 +700,40 @@ TEST_CASE("a change of the panel, the skin, the brightness or the screenshots re
 		REQUIRE(waited(applyKey("lcd4l_support")) == Status::Ok);
 		REQUIRE(box.control.calls.empty());
 	}
+}
+
+TEST_CASE("the brightness of a Samsung panel rewrites nothing: its driver reads the file as it runs", "[apply][lcd4l]")
+{
+	Fresh fresh;
+	Lcd4lBox box;
+	for (int type = 1; type <= 3; ++type)
+	{
+		INFO(type);
+		g_settings.lcd4l_display_type = type;
+		REQUIRE(waited(applyKey("lcd4l_display_type")) == Status::Ok);
+		box.control.forget();
+
+		g_settings.lcd4l_brightness += 1;
+		REQUIRE(waited(applyKey("lcd4l_brightness")) == Status::Ok);
+		REQUIRE(box.control.calls.empty());
+
+		// The skin is a layout the daemon reads only as it starts, on these panels too.
+		g_settings.lcd4l_skin += 1;
+		REQUIRE(waited(applyKey("lcd4l_skin")) == Status::Ok);
+		REQUIRE(box.control.calls.size() == 1);
+		REQUIRE(box.control.calls[0] == "reinit");
+	}
+
+	// Back on the Pearl panel the change of the panel rewrites, and so does its brightness again.
+	box.control.forget();
+	g_settings.lcd4l_display_type = 0;
+	REQUIRE(waited(applyKey("lcd4l_display_type")) == Status::Ok);
+	REQUIRE(box.control.count("reinit") == 1);
+	box.control.forget();
+	g_settings.lcd4l_brightness += 1;
+	REQUIRE(waited(applyKey("lcd4l_brightness")) == Status::Ok);
+	REQUIRE(box.control.calls.size() == 1);
+	REQUIRE(box.control.calls[0] == "reinit");
 }
 
 TEST_CASE("a service that was restarted writes its files itself and is not told to rewrite them", "[apply][lcd4l]")

@@ -68,6 +68,7 @@
 #include <coreapi/channels.h>
 #include <coreapi/streaming.h>
 #include <coreapi/system.h>
+#include <coreapi/update.h>
 #include <coreapi/box/applyworker.h>
 #include <coreapi/settings/settings.h>
 #include <coreapi/base/apply.h>
@@ -198,6 +199,9 @@
 #include <eitd/sectionsd.h>
 #ifdef ENABLE_LUA
 #include <system/luaserver.h>
+#endif
+#ifdef ENABLE_PYTHON
+#include <system/pyserver.h>
 #endif
 int old_b_id = -1;
 
@@ -1071,7 +1075,12 @@ int CNeutrinoApp::loadSetup(const char *fname)
 		}
 	}
 
-	g_settings.xmltv_xml_auto.clear();
+	/* xmltv_xml_auto is not touched here. It is no setting of the file but
+	   what the web channel lists name, and only a channel reload fills it
+	   (CBouquetManager::loadBouquets). Emptied by a reload of the settings,
+	   as it was, the hourly reread of the guide found none of those sources
+	   until the channels were reloaded, and the web channels ran out of
+	   guide. */
 
 	g_settings.livestreamResolution = configfile.getInt32("livestreamResolution", 1920);
 	setSettingsText(g_settings.livestreamScriptPath, configfile.getString("livestreamScriptPath", WEBTVDIR));
@@ -1081,6 +1090,7 @@ int CNeutrinoApp::loadSetup(const char *fname)
 	setSettingsText(g_settings.plugins_disabled, configfile.getString("plugins_disabled", ""));
 	setSettingsText(g_settings.plugins_game, configfile.getString("plugins_game", ""));
 	setSettingsText(g_settings.plugins_lua, configfile.getString("plugins_lua", ""));
+	setSettingsText(g_settings.plugins_python, configfile.getString("plugins_python", ""));
 	setSettingsText(g_settings.plugins_script, configfile.getString("plugins_script", ""));
 	setSettingsText(g_settings.plugins_tool, configfile.getString("plugins_tool", ""));
 
@@ -2056,6 +2066,7 @@ void CNeutrinoApp::saveSetup(const char *fname)
 	configfile.setString("plugins_disabled", g_settings.plugins_disabled);
 	configfile.setString("plugins_game", g_settings.plugins_game);
 	configfile.setString("plugins_lua", g_settings.plugins_lua);
+	configfile.setString("plugins_python", g_settings.plugins_python);
 	configfile.setString("plugins_script", g_settings.plugins_script);
 	configfile.setString("plugins_tool", g_settings.plugins_tool);
 
@@ -3371,6 +3382,8 @@ TIMER_START();
 	// them in the settings are the setup screen's own buffer, so nothing but
 	// this answers what a recording really starts and stops on.
 	coreapi::installRealRecordingSafetySource();
+	// The update server, asked by the same check the menu and the background run.
+	coreapi::update::installRealOnlineSource();
 	// The size the box draws at, which is kept beside the settings rather than
 	// in them: the save writes that copy and not the member.
 	installOsdResolutionSource();
@@ -3595,6 +3608,7 @@ TIMER_START();
 	CFileHelpers::createDir(THEMESDIR_VAR);
 	CFileHelpers::createDir(PLUGINDIR_VAR);
 	CFileHelpers::createDir(LUAPLUGINDIR_VAR);
+	CFileHelpers::createDir(PYTHONPLUGINDIR_VAR);
 	CFileHelpers::createDir(WEBRADIODIR_VAR);
 	CFileHelpers::createDir(WEBTVDIR_VAR);
 	CFileHelpers::createDir(PUBLIC_HTTPDDIR);
@@ -3695,6 +3709,9 @@ void CNeutrinoApp::RealRun()
 #ifdef ENABLE_LUA
 	CLuaServer *luaServer = CLuaServer::getInstance();
 #endif
+#ifdef ENABLE_PYTHON
+	CPythonServer *pyServer = CPythonServer::getInstance();
+#endif
 	g_Plugins->startPlugin("startup");
 	if (!g_Plugins->getScriptOutput().empty()) {
 		ShowMsg(LOCALE_PLUGINS_RESULT, g_Plugins->getScriptOutput(), CMsgBox::mbrBack, CMsgBox::mbBack, NEUTRINO_ICON_SHELL);
@@ -3713,9 +3730,16 @@ void CNeutrinoApp::RealRun()
 #ifdef ENABLE_LUA
 		luaServer->UnBlock();
 #endif
+#ifdef ENABLE_PYTHON
+		pyServer->UnBlock();
+#endif
 		g_RCInput->getMsg(&msg, &data, 100, ((g_settings.mode_left_right_key_tv == SNeutrinoSettings::VOLUME) && (g_RemoteControl->subChannels.size() < 1)) ? true : false);	// 10 secs..
 #ifdef ENABLE_LUA
 		if (luaServer->Block(msg, data))
+			continue;
+#endif
+#ifdef ENABLE_PYTHON
+		if (pyServer->Block(msg, data))
 			continue;
 #endif
 
@@ -4479,6 +4503,7 @@ coreapi::Status coreapi::boxPlugins(coreapi::PluginList &out)
 			case CPlugins::P_TYPE_TOOL:     one.kind = coreapi::PluginKind::Tool; break;
 			case CPlugins::P_TYPE_SCRIPT:   one.kind = coreapi::PluginKind::Script; break;
 			case CPlugins::P_TYPE_LUA:      one.kind = coreapi::PluginKind::Lua; break;
+			case CPlugins::P_TYPE_PYTHON:   one.kind = coreapi::PluginKind::Python; break;
 			default:                        one.kind = coreapi::PluginKind::Unknown; break;
 		}
 		one.hidden = g_Plugins->isHidden(i);
@@ -4544,6 +4569,9 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		if (mode != NeutrinoModes::mode_webtv && mode != NeutrinoModes::mode_webradio) {
 			delete [] (unsigned char*) data;
 		} else if (CMoviePlayerGui::getInstance().RestartLastWebtv(chid)) {
+#ifdef ENABLE_GRAPHLCD
+			cGLCD::releaseZapFailure();
+#endif
 			delete [] (unsigned char*) data;
 		} else {
 			if (mode == NeutrinoModes::mode_webtv || mode == NeutrinoModes::mode_webradio)
@@ -4574,6 +4602,10 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 				}
 				if (CMoviePlayerGui::getInstance().RestartBackground(cc->getUrl(), cc->getName(), cc->getChannelID(), cc->getScriptName())) {
 					printf("[webtv] zap complete: restart accepted channel=%llx\n", (unsigned long long)chid);
+#ifdef ENABLE_GRAPHLCD
+					/* webtv sends no EVT_ZAP_COMPLETE: this is its success. */
+					cGLCD::releaseZapFailure();
+#endif
 					delete [] (unsigned char*) data;
 				}
 				else
@@ -4629,6 +4661,9 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 
 		CVFD::getInstance()->UpdateIcons();
 #ifdef ENABLE_GRAPHLCD
+		/* A zap that no zapTo_ChannelID started (a timer, zapit itself)
+		   ends the failure shown before it as well. */
+		cGLCD::releaseZapFailure();
 		cGLCD::Update();
 #endif
 		g_RCInput->killTimer(scrambled_timer);
@@ -4675,6 +4710,13 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 			if (g_bouquetManager && g_bouquetManager->getWebchannelsFailedDownloads() > 0) {
 				g_bouquetManager->setWebchannelsReloadReason("boot_retry");
 				g_Zapit->reinitChannels();
+				/* The guide too, as the reload from the settings does: the
+				   lists that failed at boot are where the XMLTV sources of
+				   their channels are named (tvg-url, xmltv=), so the read at
+				   boot had none of them, and a network that was not up then
+				   failed the sources named by hand as well. */
+				xmltv_xml_readepg();
+				xmltv_xml_auto_readepg();
 			}
 			return messages_return::handled;
 		}
@@ -5409,6 +5451,26 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		delete[] (unsigned char*) data;
 		return messages_return::handled;
 	}
+	else if (msg == NeutrinoMessages::EVT_LOCAL_UPDATE) {
+		/* An image update sent from the web interface: install.sh with the file,
+		 * as the menu's local update runs it, and nothing on the screen, so a box
+		 * in standby stays there. Asked whether the box records once more here:
+		 * what sent this asked on another thread, and a timer may have started a
+		 * recording since. */
+		const coreapi::update::Asked asked = coreapi::update::asked((const char *) data);
+		delete[] (unsigned char *) data;
+		if (!asked.valid || mode == NeutrinoModes::mode_unknown
+		    || CRecordManager::getInstance()->RecordingStatus()) {
+			printf("[neutrino] image update not installed: %s\n",
+				!asked.valid ? "request not understood"
+				: mode == NeutrinoModes::mode_unknown ? "the box is still starting" : "the box is recording");
+			return messages_return::handled;
+		}
+		printf("[neutrino] installing image update %s\n", asked.path.c_str());
+		const int rc = coreapi::update::install(asked);
+		printf("[neutrino] image update %s done: %d\n", asked.path.c_str(), rc);
+		return messages_return::handled;
+	}
 	else if (msg == NeutrinoMessages::EVT_PLAY_RECORDING) {
 		const coreapi::archive::PlayAsked asked = coreapi::archive::playAsked((const char *) data);
 		// A file playing is ended only with the leave the web sent along; without it the play is dropped below.
@@ -5447,6 +5509,12 @@ int CNeutrinoApp::handleMsg(const neutrino_msg_t _msg, neutrino_msg_data_t data)
 		return messages_return::handled;
 	}
 	else if (msg == NeutrinoMessages::EVT_RELOAD_XMLTV) {
+		/* Hourly from sectionsd's housekeeping. Always while the box is on:
+		   a source with a few hours of guide is empty otherwise. In standby
+		   only where the EPG background scan scans in standby; waking reads
+		   it in any case (standbyMode). */
+		if (mode == NeutrinoModes::mode_standby && !(g_settings.epg_scan_mode & EPG_SCAN_MODE_STANDBY))
+			return messages_return::handled;
 		printf("CNeutrinoApp::handleMsg: reload xmltv epg\n");
 		xmltv_xml_readepg();
 		xmltv_xml_auto_readepg();
@@ -6229,6 +6297,12 @@ void CNeutrinoApp::standbyMode(bool bOnOff, bool fromDeepStandby, bool leaveTv)
 		channelList->zapTo_ChannelID(live_channel_id, true); /* force re-zap */
 
 		g_Sectionsd->setPauseScanning(false);
+
+		/* The XMLTV guide at once, and not at the next hour: where it was not
+		   read in standby, a source with a few hours of guide is empty by
+		   now. */
+		xmltv_xml_readepg();
+		xmltv_xml_auto_readepg();
 
 		InfoClock->enableInfoClock(true);
 		InfoIcons->enableInfoIcons(true); // InfoIcons
