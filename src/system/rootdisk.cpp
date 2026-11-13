@@ -25,6 +25,7 @@
 #include <cstdlib>
 #include <string>
 #include <sys/stat.h>
+#include <sys/vfs.h>
 #include <sys/sysmacros.h>
 
 #include "rootdisk.h"
@@ -85,6 +86,12 @@ bool dir_on_root_disk(const char *dir)
 	(void) dir;
 	return false;
 #else
-	return dir_on_disk_of(dir, "/", "/sys/dev/block");
+	// The Formuler USB loader keeps the internal UBIFS root at /.openpli.
+	constexpr unsigned long ubifs_magic = 0x24051905;
+	struct statfs internal;
+	const char *root = statfs("/.openpli", &internal) == 0
+		&& static_cast<unsigned long>(internal.f_type) == ubifs_magic
+		? "/.openpli" : "/";
+	return dir_on_disk_of(dir, root, "/sys/dev/block");
 #endif
 }
