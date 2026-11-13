@@ -3259,9 +3259,22 @@ TIMER_START();
 	else
 		hintBox->paint();
 
+#if BOXMODEL_FORMULER3
+	// The front panel formats the progress value as -NN-.
+	for (int progress = 0; progress <= 99; ++progress)
+	{
+		char value[5];
+		snprintf(value, sizeof(value), "%02d \n", progress);
+		if (proc_put("/proc/progress", value) < 0)
+			break;
+		usleep(30000);
+	}
+#endif
 	CVFD::getInstance()->init(neutrinoFonts->fontDescr.filename.c_str(), neutrinoFonts->fontDescr.name.c_str());
+#if !BOXMODEL_FORMULER3
 	CVFD::getInstance()->Clear();
 	CVFD::getInstance()->ShowText(g_Locale->getText(LOCALE_NI));
+#endif
 
 #ifdef ENABLE_GRAPHLCD
 	cGLCD::getInstance();
