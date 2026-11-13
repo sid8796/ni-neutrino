@@ -558,6 +558,12 @@ elif test "$BOXMODEL" = "osninopro"; then
 	AC_DEFINE(BOXMODEL_OSNINOPRO, 1, [osninopro])
 fi
 
+case "$BOXMODEL" in
+	formuler1|formuler3|formuler4|formuler4turbo)
+		AC_DEFINE(BOXMODEL_FORMULER_FAMILY, 1, [Formuler F1, F3, F4 or F4 Turbo])
+		;;
+esac
+
 # all vuplus BOXMODELs
 case "$BOXMODEL" in
 	vusolo4k|vuduo4k|vuduo4kse|vuultimo4k|vuuno4k|vuuno4kse|vuzero4k|vuduo|vuduo2)

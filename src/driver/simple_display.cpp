@@ -431,18 +431,13 @@ void CLCD::showAudioProgress(const char, bool)
 {
 }
 
-#if BOXMODEL_E4HDULTRA || BOXMODEL_PROTEK4K || HAVE_MIPS_HARDWARE
+#if BOXMODEL_E4HDULTRA || BOXMODEL_PROTEK4K || BOXMODEL_FORMULER_FAMILY
 /* The front LED of these boxes follows the AV input: "aux" turns it red,
    "encoder" turns it back. Enigma2 switches the input this way on entering
    and leaving standby. Written on a change only, and the first call always
    writes, so a restart out of standby does not leave the LED red. */
 static void setStandbyLed(bool standby)
 {
-#if HAVE_MIPS_HARDWARE
-	const std::string model = g_info.hw_caps->boxmodel;
-	if (model != "formuler1" && model != "formuler3" && model != "formuler4" && model != "formuler4turbo")
-		return;
-#endif
 	static int written = -1;
 	if (written == (int)standby)
 		return;
@@ -492,7 +487,7 @@ void CLCD::setMode(const MODES m, const char * const title)
 		if (g_info.hw_caps->display_type == HW_DISPLAY_NONE)
 			proc_put("/proc/stb/power/powerled", "off");
 		proc_put("/proc/stb/lcd/show_symbols", false);
-#if BOXMODEL_E4HDULTRA || BOXMODEL_PROTEK4K || HAVE_MIPS_HARDWARE
+#if BOXMODEL_E4HDULTRA || BOXMODEL_PROTEK4K || BOXMODEL_FORMULER_FAMILY
 		setStandbyLed(true);
 #endif
 		timeout_cnt = 0;
@@ -504,7 +499,7 @@ void CLCD::setMode(const MODES m, const char * const title)
 #if HAVE_ARM_HARDWARE || HAVE_MIPS_HARDWARE
 	if (m != MODE_SHUTDOWN && m != MODE_STANDBY)
 	{
-#if BOXMODEL_E4HDULTRA || BOXMODEL_PROTEK4K || HAVE_MIPS_HARDWARE
+#if BOXMODEL_E4HDULTRA || BOXMODEL_PROTEK4K || BOXMODEL_FORMULER_FAMILY
 		/* back from standby; deep standby is left to the box, as Enigma2 does */
 		setStandbyLed(false);
 #endif
