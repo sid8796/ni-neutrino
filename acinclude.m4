@@ -469,7 +469,10 @@ AM_CONDITIONAL(BOXMODEL_VUUNO4KSE, test "$BOXMODEL" = "vuuno4kse")
 AM_CONDITIONAL(BOXMODEL_VUZERO4K, test "$BOXMODEL" = "vuzero4k")
 
 # mipsbox
+AM_CONDITIONAL(BOXMODEL_FORMULER1, test "$BOXMODEL" = "formuler1")
 AM_CONDITIONAL(BOXMODEL_FORMULER3, test "$BOXMODEL" = "formuler3")
+AM_CONDITIONAL(BOXMODEL_FORMULER4, test "$BOXMODEL" = "formuler4")
+AM_CONDITIONAL(BOXMODEL_FORMULER4TURBO, test "$BOXMODEL" = "formuler4turbo")
 AM_CONDITIONAL(BOXMODEL_VUDUO, test "$BOXMODEL" = "vuduo")
 AM_CONDITIONAL(BOXMODEL_VUDUO2, test "$BOXMODEL" = "vuduo2")
 
@@ -543,8 +546,14 @@ elif test "$BOXMODEL" = "vuzero4k"; then
 	AC_DEFINE(BOXMODEL_VUZERO4K, 1, [vuzero4k])
 
 # mipsbox
+elif test "$BOXMODEL" = "formuler1"; then
+	AC_DEFINE(BOXMODEL_FORMULER1, 1, [Formuler F1 BCM7356])
 elif test "$BOXMODEL" = "formuler3"; then
 	AC_DEFINE(BOXMODEL_FORMULER3, 1, [Formuler F3 BCM7362])
+elif test "$BOXMODEL" = "formuler4"; then
+	AC_DEFINE(BOXMODEL_FORMULER4, 1, [Formuler F4 BCM7362])
+elif test "$BOXMODEL" = "formuler4turbo"; then
+	AC_DEFINE(BOXMODEL_FORMULER4TURBO, 1, [Formuler F4 Turbo BCM73625])
 elif test "$BOXMODEL" = "vuduo"; then
 	AC_DEFINE(BOXMODEL_VUDUO, 1, [vuduo])
 elif test "$BOXMODEL" = "vuduo2"; then
