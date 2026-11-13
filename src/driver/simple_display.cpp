@@ -273,11 +273,23 @@ void CLCD::showTime(bool force)
 		char timestr[64]; /* todo: change if we have a simple display with 63+ chars ;) */
 		struct tm *t;
 		static int hour = 0, minute = 0;
+		static int second = -1;
 
-		t = localtime(&now);
-		if (force || last_display || (switch_name_time_cnt == 0 && ((hour != t->tm_hour) || (minute != t->tm_min)))) {
+		const std::string model = g_info.hw_caps->boxmodel;
+		const bool blink_colon = g_info.hw_caps->display_has_colon == 1
+			&& (model == "formuler1" || model == "formuler3"
+			    || model == "formuler4" || model == "formuler4turbo");
+
+		struct tm parts;
+		t = localtime_r(&now, &parts);
+		if (!t)
+			return;
+		const bool clock_changed = hour != t->tm_hour || minute != t->tm_min
+			|| (blink_colon && second != t->tm_sec);
+		if (force || last_display || (switch_name_time_cnt == 0 && clock_changed)) {
 			hour = t->tm_hour;
 			minute = t->tm_min;
+			second = t->tm_sec;
 #if !HAVE_ARM_HARDWARE && !HAVE_MIPS_HARDWARE
 			int ret = -1;
 #endif
@@ -292,7 +304,8 @@ void CLCD::showTime(bool force)
 				if (ret < 0 && servicename.empty() && servicenumber == -1)
 #endif
 				{
-					if (g_info.hw_caps->display_xres == 4 && g_info.hw_caps->display_has_colon == 1)
+					if (g_info.hw_caps->display_xres == 4 && g_info.hw_caps->display_has_colon == 1
+					    && (!blink_colon || second % 2 == 0))
 						sprintf(timestr, "%02d:%02d", hour, minute);
 					else if (g_info.hw_caps->display_xres < 5)
 						sprintf(timestr, "%02d%02d", hour, minute);
