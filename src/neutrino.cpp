@@ -3259,22 +3259,27 @@ TIMER_START();
 	else
 		hintBox->paint();
 
-#if BOXMODEL_FORMULER3
-	// The front panel formats the progress value as -NN-.
-	for (int progress = 0; progress <= 99; ++progress)
+	const std::string model = g_info.hw_caps->boxmodel;
+	bool progress_shown = false;
+	if (model == "formuler1" || model == "formuler3" || model == "formuler4" || model == "formuler4turbo")
 	{
-		char value[5];
-		snprintf(value, sizeof(value), "%02d \n", progress);
-		if (proc_put("/proc/progress", value) < 0)
-			break;
-		usleep(30000);
+		// The front panel formats the progress value as -NN-.
+		for (int progress = 0; progress <= 99; ++progress)
+		{
+			char value[5];
+			snprintf(value, sizeof(value), "%02d \n", progress);
+			if (proc_put("/proc/progress", value) != 4)
+				break;
+			progress_shown = true;
+			usleep(30000);
+		}
 	}
-#endif
 	CVFD::getInstance()->init(neutrinoFonts->fontDescr.filename.c_str(), neutrinoFonts->fontDescr.name.c_str());
-#if !BOXMODEL_FORMULER3
-	CVFD::getInstance()->Clear();
-	CVFD::getInstance()->ShowText(g_Locale->getText(LOCALE_NI));
-#endif
+	if (!progress_shown)
+	{
+		CVFD::getInstance()->Clear();
+		CVFD::getInstance()->ShowText(g_Locale->getText(LOCALE_NI));
+	}
 
 #ifdef ENABLE_GRAPHLCD
 	cGLCD::getInstance();
