@@ -2,10 +2,11 @@ installdir = $(ICONSDIR)
 
 install_DATA = \
 	deutsch.png \
-	english.png
+	english.png \
+	russian.png \
+	slovak.png
 
 unmaintained = \
-	nederlands.png \
-	slovak.png
+	nederlands.png
 
 #install_DATA += $(unmaintained)

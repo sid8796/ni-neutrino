@@ -1,4 +1,4 @@
-AUDIOSelectMenue.head Audio options
+AUDIOSelectMenue.head Параметры звука
 EPGMenu.epgplus Телегид по всем каналам
 EPGMenu.eventinfo Передачи канала подробно
 EPGMenu.eventlist Телегид канала
@@ -16,8 +16,8 @@ EPGPlus.prev_bouquet Пакет обратно
 EPGPlus.record запись
 EPGPlus.refresh_epg обновить
 EPGPlus.remind запомнить
-EPGPlus.scroll_mode Scroll Mode
-EPGPlus.stretch_mode Stretch Mode
+EPGPlus.scroll_mode Режим прокрутки
+EPGPlus.stretch_mode Режим растяжения
 EPGPlus.swap_mode режим обмена
 EPGPlus.view_mode режим просмотра
 GENRE.ALL off
@@ -219,7 +219,7 @@ auto_update_check_monthly monthly
 auto_update_check_off off
 auto_update_check_on_start_only only on start
 auto_update_check_weekly weekly
-blank_screen Blank screen
+blank_screen Пустой экран
 bookmarkmanager.delete Удалить
 bookmarkmanager.name Закладки
 bookmarkmanager.rename Переименовать
@@ -1333,14 +1333,14 @@ mainmenu.recording Запись
 mainmenu.recording_start Начать
 mainmenu.recording_stop Остановить
 mainmenu.scripts Скрипты
-mainmenu.service Установка и обслуживание
-mainmenu.settings Настройки системы
-mainmenu.shutdown Полное выключение
-mainmenu.sleeptimer Таймер сна
+mainmenu.service Установка (обслуживание)
+mainmenu.settings Настройки
+mainmenu.shutdown Выключение
+mainmenu.sleeptimer Таймер
 mainmenu.standby Режим ожидания
 mainmenu.tools Инструменты
 mainmenu.tvmode Телевидение
-mainmenu.tvradio_switch Переключение ТВ/радио
+mainmenu.tvradio_switch Переключение ТВ/Радио
 mainsettings.audio Аудио
 mainsettings.head Настройки
 mainsettings.keybinding Настройки пульта ДУ
@@ -1413,7 +1413,7 @@ menu.hint_back_brief Return to previous menu
 menu.hint_backlight Configure buttons backlight
 menu.hint_backup Backup configs and channels to selected dir
 menu.hint_bedit Edit favorites and bouquets
-menu.hint_blank_screen Turn off VideoDecoder until next event (keypress, timer etc.)
+menu.hint_blank_screen Отключает видеодекодер до следующего события (нажатие клавиши, таймер и т. п.)
 menu.hint_buildinfo Information about compilers, compiler flags, kernel
 menu.hint_ca_init Configuration of CA-system hardware, CA-module and card slots
 menu.hint_cache_txt Start teletext caching after channel switch
@@ -1521,7 +1521,7 @@ menu.hint_inactive_back Change inactive item background color
 menu.hint_inactive_textcolor Change inactive item text color
 menu.hint_inetradio Internet radio
 menu.hint_inetradio_autostart Start play of first entry from favorites automatically
-menu.hint_info Show system informations.
+menu.hint_info Просмотр информации о системе.
 menu.hint_infobar_analogclock Shows an analog clock instead of the digital display of the time
 menu.hint_infobar_back Change infobar background color
 menu.hint_infobar_buttons_usertitle Forces userdefined titles for the color keys
@@ -1653,7 +1653,7 @@ menu.hint_make_webtvlist Auto-create WebTV channel list based on\nchannel type a
 menu.hint_manage_settings Backup, restore, revert to defaults\nFactory box reset
 menu.hint_mb Your recordings
 menu.hint_mbkey_cover Assign button to create movie cover while playback or delete it in moviebrowser
-menu.hint_media Play movies, audio files\nWatch pictures
+menu.hint_media Воспроизведение фильмов, аудиофайлов\nПросмотр фотографий
 menu.hint_menu_fonts Change menu font sizes
 menu.hint_menu_hints Show this hints. Also you can switch\nit any time using 'help' button
 menu.hint_menu_hints_line Activate/deactivate the line from the menu to this hints
@@ -1778,7 +1778,7 @@ menu.hint_protection Protect content by PIN code\nDefault PIN 0000
 menu.hint_python Запуск плагинов Python
 menu.hint_quadpip Activate QuadPiP
 menu.hint_radiomode Switch box to radio mode
-menu.hint_reboot Reboot box\nNo confirmation
+menu.hint_reboot Перезагрузка устройства\nБез подтверждения
 menu.hint_record_already_found_check Checks before setting a new record timer if an eponymous title already exists
 menu.hint_record_apid_ac3 Record AC3 audio pids
 menu.hint_record_apid_alt Record alternative non-AC3 audio pids
@@ -1914,18 +1914,18 @@ menu.hint_screenshot_video Include live video in screenshot
 menu.hint_scripts Run scripts
 menu.hint_selected_back Change selected item background color
 menu.hint_selected_text Change selected item text color
-menu.hint_service Tuner setup, service scan,\nbouquet editor, software upgrade
+menu.hint_service Настройка тюнера, сканирование каналов, \nредактор списков каналов, обновление ПО
 menu.hint_service_scan Auto and manual service scan
-menu.hint_settings Configure System\nNetwork, audio, video, OSD etc.
+menu.hint_settings Настройка системы\nСеть, звук, видео, OSD и т. д.
 menu.hint_shoutcast_dev_id Type your SHOUTcast Developer ID. An empty input disables SHOUTcast support
 menu.hint_shoutcast_enabled Enable or disable SHOUTcast support
 menu.hint_show_mute_icon Show mute icon, when volume set to 0
-menu.hint_shutdown Fully shuts down the box (deep-standby, lowest power use). No confirmation.
+menu.hint_shutdown Устройство полностью выключается.\nМинимум энергопотребления.\nБез подтверждения.
 menu.hint_shutdown_block_recording Do not fully power down while a recording is running or scheduled. The box switches off once no recording is pending.
 menu.hint_shutdown_count Time to put box in deep-standby\nfrom soft-standby mode
 menu.hint_shutdown_rcdelay Enable deep-standby, if power button\npressed more than 1 second
 menu.hint_shutdown_real Enable soft-standby mode\nIf disabled, power button put box to deep-standby
-menu.hint_sleeptimer Switches the box to standby once after a set number of minutes.\n000 = off
+menu.hint_sleeptimer Переводит устройство в режим ожидания по истечении настраиваемого времени.\n000 = выкл.
 menu.hint_sleeptimer_min Default value (minutes) used to pre-fill the sleeptimer dialog. Does not arm anything itself.
 menu.hint_sms_channel If enabled, numeric buttons in channel list used to search channel in SMS style
 menu.hint_sms_movie If enabled, numeric buttons in moviebrowser used to search movie in SMS style
@@ -1937,7 +1937,7 @@ menu.hint_softupdate_expert Separate partitions from the flash. Read and write t
 menu.hint_softupdate_expert_read Separate partitions (U-Boot, Splash, Kernel, SystemFS) from the flash read
 menu.hint_softupdate_expert_write Separate partitions (Splash, Kernel, SystemFS) write to the flash
 menu.hint_softupdate_settings The local update directory and the configuration file to set
-menu.hint_standby Puts the box into standby immediately. Quick power-on possible.
+menu.hint_standby Мгновенно переводит устройство в режим ожидания. Возможен быстрый запуск.
 menu.hint_start_tostandby Enter standby mode after boot
 menu.hint_streaminfo Current channel info: pids, signal and noise ratio\nBitrate graphs
 menu.hint_subchannel_pos Select subchannels menu position
@@ -1952,7 +1952,7 @@ menu.hint_tmdb_api_key Type your TMDb API key. An empty input disables TMDb supp
 menu.hint_tmdb_enabled Enable or disable TMDb support (themoviedb.org)
 menu.hint_tools Run tools
 menu.hint_tvmode Switch box to TV mode
-menu.hint_tvradio_switch Switches between TV and Radio mode
+menu.hint_tvradio_switch Переключение между режимами «ТВ» и «Радио»
 menu.hint_uni_setup Configuration of unicable frequency, user band and pin
 menu.hint_upnp Universal Plug and Play Browser
 menu.hint_vfd Frontpanel LEDs, VFD options
@@ -2568,9 +2568,9 @@ personalize.button_red red
 personalize.button_yellow yellow
 personalize.disabled Disabled
 personalize.enabled Enabled
-personalize.head Personalization
-personalize.help Help
-personalize.help_line1 Personalization makes it possible to adapt the most
+personalize.head Настройка меню
+personalize.help Помощь
+personalize.help_line1 Персонализация позволяет выбрать наиболее важные параметры.
 personalize.help_line2 important menus you need. Menus
 personalize.help_line3 can be set to visible, not visible, activate, deactivate
 personalize.help_line4 or PIN-protected.
@@ -2583,7 +2583,7 @@ personalize.menudisabledhint The requested menu is currently disabled!\nFor acti
 personalize.notprotected No
 personalize.notvisible Not Visible
 personalize.pin PIN
-personalize.pin_in_use PIN access for personalize setup
+personalize.pin_in_use Доступ по PIN-коду для настройки персональных параметров
 personalize.pincode Personalization PIN
 personalize.pinhint Enter the Personalization PIN Code
 personalize.pinprotect Yes
